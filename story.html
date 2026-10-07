@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Story Mode — Tenfold Legends</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .story-page { min-height: 100vh; padding-bottom: 60px; }
+
+    /* ── BANNER ── */
+    .story-banner {
+      position: relative; overflow: hidden;
+      padding: 36px 40px 28px; text-align: center;
+      background: linear-gradient(135deg, rgba(18,5,0,.97) 0%, rgba(8,5,18,.97) 50%, rgba(0,8,18,.97) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .story-banner::before {
+      content:''; position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(233,69,96,.1) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 50%, rgba(240,192,64,.07) 0%, transparent 55%);
+      pointer-events:none;
+    }
+    .story-banner-title {
+      font-family:'Cinzel',serif; font-size:2.2rem; font-weight:900;
+      color:var(--gold); letter-spacing:6px;
+      filter:drop-shadow(0 0 20px rgba(240,192,64,.4));
+    }
+    .story-banner-sub { font-size:.85rem; color:var(--subtext); letter-spacing:3px; margin-top:5px; }
+    .story-stats-row { display:flex; justify-content:center; gap:24px; margin-top:18px; flex-wrap:wrap; }
+    .sstat-box { text-align:center; padding:9px 20px; background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:8px; min-width:100px; }
+    .sstat-val { font-family:'Cinzel',serif; font-size:1.7rem; font-weight:900; color:var(--gold); }
+    .sstat-lbl { font-size:.65rem; color:var(--subtext); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+
+    /* ── HERO BAR ── */
+    .hero-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 40px; background:rgba(8,8,18,.75);
+      border-bottom:1px solid rgba(240,192,64,.1);
+    }
+    .hb-left { display:flex; align-items:center; gap:12px; }
+    .hb-portrait {
+      width:40px; height:40px; border-radius:6px;
+      object-fit:cover; object-position:top; border:2px solid var(--gold);
+    }
+    .hb-portrait-fb {
+      width:40px; height:40px; border-radius:6px; border:2px solid var(--gold);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.2rem; background:rgba(255,255,255,.05);
+    }
+    .hb-name { font-family:'Cinzel',serif; font-size:.9rem; color:var(--gold); font-weight:700; }
+    .hb-sub  { font-size:.72rem; color:var(--subtext); margin-top:1px; }
+
+    /* ── SKILL UNLOCK LEGEND ── */
+    .unlock-legend {
+      display:flex; justify-content:center; gap:18px; flex-wrap:wrap;
+      padding:10px 40px 0; max-width:900px; margin:0 auto;
+    }
+    .ul-item {
+      display:flex; align-items:center; gap:6px;
+      font-size:.75rem; color:var(--subtext);
+    }
+    .ul-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+    /* ── CHAPTERS WRAP ── */
+    .chapters-wrap { max-width:920px; margin:22px auto 0; padding:0 28px; display:flex; flex-direction:column; gap:14px; }
+
+    /* ── CHAPTER CARD ── */
+    .chapter-card {
+      background:rgba(8,8,18,.9); border:1px solid rgba(240,192,64,.15);
+      border-radius:10px; overflow:hidden; backdrop-filter:blur(10px);
+      transition:border-color .2s;
+    }
+    .chapter-card.unlocked:hover { border-color:rgba(240,192,64,.35); }
+    .chapter-card.locked { opacity:.45; }
+    .chapter-card.ch-complete { border-color:rgba(240,192,64,.4); }
+    .chapter-card.ch-final { border-color:rgba(233,69,96,.4); }
+    .chapter-card.ch-final:hover { border-color:rgba(233,69,96,.7); }
+
+    .chapter-header {
+      display:flex; align-items:center; gap:16px;
+      padding:16px 20px; cursor:pointer; user-select:none;
+    }
+    .chapter-card.locked .chapter-header { cursor:not-allowed; }
+    .ch-num {
+      font-family:'Cinzel',serif; font-size:2rem; font-weight:900;
+      color:rgba(240,192,64,.22); width:52px; flex-shrink:0; line-height:1;
+    }
+
+    /* Hero portrait inside chapter header */
+    .ch-hero-portrait {
+      width:52px; height:62px; border-radius:7px;
+      object-fit:cover; object-position:top;
+      border:2px solid rgba(240,192,64,.25); flex-shrink:0;
+    }
+    .ch-hero-portrait-fb {
+      width:52px; height:62px; border-radius:7px;
+      border:2px solid rgba(240,192,64,.25);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.8rem; background:rgba(255,255,255,.03); flex-shrink:0;
+    }
+
+    .ch-info { flex:1; min-width:0; }
+    .ch-title {
+      font-family:'Cinzel',serif; font-size:1rem; font-weight:700;
+      color:var(--text); letter-spacing:2px;
+    }
+    .ch-desc { font-size:.8rem; color:var(--subtext); margin-top:3px; line-height:1.5; }
+    .ch-meta { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
+    .ch-badge {
+      font-size:.65rem; font-weight:700; letter-spacing:1px;
+      padding:2px 8px; border-radius:20px;
+      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+      color:var(--subtext);
+    }
+    .ch-right {
+      display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0;
+    }
+    .ch-stars-total { font-size:.8rem; color:var(--gold); font-family:'Cinzel',serif; }
+    .ch-chevron { color:var(--subtext); font-size:.9rem; transition:transform .3s; }
+    .chapter-card.open .ch-chevron { transform:rotate(180deg); }
+    .ch-lock-icon { font-size:1.2rem; opacity:.5; }
+
+    /* FINAL chapter styling */
+    .ch-final-badge {
+      font-size:.65rem; font-weight:900; letter-spacing:2px;
+      padding:3px 10px; border-radius:20px;
+      background:rgba(233,69,96,.15); border:1px solid rgba(233,69,96,.4);
+      color:#ff7090;
+    }
+
+    /* ── STAGES ── */
+    .chapter-stages { display:none; padding:4px 20px 18px; }
+    .chapter-card.open .chapter-stages { display:block; }
+    .stages-divider {
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:12px; color:var(--subtext);
+      font-size:.68rem; letter-spacing:2px; text-transform:uppercase;
+    }
+    .stages-divider::before,.stages-divider::after {
+      content:''; flex:1; height:1px; background:rgba(240,192,64,.12);
+    }
+    .stages-row { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+    @media(max-width:680px){ .stages-row{grid-template-columns:repeat(3,1fr);} }
+    @media(max-width:420px){ .stages-row{grid-template-columns:repeat(2,1fr);} }
+
+    .stage-btn {
+      position:relative; padding:14px 8px 12px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:9px; cursor:pointer; text-align:center;
+      transition:all .2s; font-family:'Rajdhani',sans-serif;
+    }
+    .stage-btn:hover:not(.stage-locked) {
+      background:rgba(240,192,64,.07); border-color:rgba(240,192,64,.35);
+      transform:translateY(-3px);
+    }
+    .stage-btn.stage-locked { opacity:.35; cursor:not-allowed; }
+    .stage-btn.stage-done   { border-color:rgba(240,192,64,.3); background:rgba(240,192,64,.04); }
+    .stage-btn.stage-next   {
+      border-color:var(--gold);
+      box-shadow:0 0 14px rgba(240,192,64,.3);
+      animation:stagePulse 2s ease-in-out infinite;
+    }
+    .stage-btn.stage-boss {
+      border-color:rgba(233,69,96,.5);
+      background:rgba(233,69,96,.06);
+    }
+    .stage-btn.stage-boss:hover:not(.stage-locked) {
+      border-color:rgba(233,69,96,.8);
+      box-shadow:0 0 18px rgba(233,69,96,.4);
+    }
+    .stage-btn.stage-boss.stage-next {
+      border-color:#e94560;
+      box-shadow:0 0 16px rgba(233,69,96,.5);
+      animation:bossPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes stagePulse {
+      0%,100%{box-shadow:0 0 10px rgba(240,192,64,.25);}
+      50%    {box-shadow:0 0 22px rgba(240,192,64,.6);}
+    }
+    @keyframes bossPulse {
+      0%,100%{box-shadow:0 0 10px rgba(233,69,96,.35);}
+      50%    {box-shadow:0 0 24px rgba(233,69,96,.75);}
+    }
+
+    .stage-num    { font-size:.65rem; color:var(--subtext); letter-spacing:1px; margin-bottom:3px; }
+    .stage-name   { font-size:.85rem; font-weight:700; color:var(--text); line-height:1.3; margin-bottom:4px; }
+    .stage-lv     { font-size:.7rem; margin-bottom:4px; }
+    .stage-stars  { display:flex; justify-content:center; gap:2px; margin-bottom:5px; }
+    .stage-star   { font-size:.82rem; }
+    .stage-star.on  { color:var(--gold); }
+    .stage-star.off { color:rgba(255,255,255,.12); }
+
+    /* Unlock badge on stage */
+    .stage-unlock-badge {
+      display:inline-flex; align-items:center; gap:3px;
+      font-size:.58rem; font-weight:900; letter-spacing:.5px;
+      padding:2px 6px; border-radius:10px; margin-top:2px;
+    }
+    .sub-basic    { background:rgba(160,160,160,.2); color:#ccc;     border:1px solid rgba(160,160,160,.4); }
+    .sub-special  { background:rgba(60,130,255,.2);  color:#66aaff;  border:1px solid rgba(60,130,255,.4); }
+    .sub-ultimate { background:rgba(240,192,64,.2);  color:var(--gold); border:1px solid rgba(240,192,64,.5); }
+    .sub-hero     { background:rgba(233,69,96,.2);   color:#ff7090;  border:1px solid rgba(233,69,96,.5); }
+    .sub-locked-badge { background:rgba(255,255,255,.05); color:var(--subtext); border:1px solid rgba(255,255,255,.1); }
+
+    /* ── BOSS LEVEL MATCH BADGE on stage card ── */
+    .boss-lv-match {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:.62rem; font-weight:900; letter-spacing:.5px;
+      padding:3px 7px; border-radius:12px; margin-top:3px;
+      background:rgba(233,69,96,.15);
+      border:1px solid rgba(233,69,96,.45);
+      color:#ff8099;
+    }
+    .boss-lv-match .eq-icon { color:#f0c040; font-size:.75rem; }
+
+    /* ── PRE-BOSS STORY MODAL ── */
+    #boss-intro-overlay {
+      display:none;
+      position:fixed; inset:0; z-index:9000;
+      background:rgba(0,0,0,.88);
+      align-items:center; justify-content:center;
+      padding:20px;
+    }
+    #boss-intro-overlay.show { display:flex; animation:biFadeIn .4s ease; }
+    @keyframes biFadeIn { from{opacity:0;transform:scale(.96);} to{opacity:1;transform:scale(1);} }
+
+    .boss-intro-box {
+      position:relative; max-width:560px; width:100%;
+      background:linear-gradient(160deg, #0d0d20 0%, #12001a 100%);
+      border:1px solid rgba(233,69,96,.5);
+      border-radius:16px; overflow:hidden;
+      box-shadow:0 0 60px rgba(233,69,96,.25), 0 0 120px rgba(233,69,96,.08);
+    }
+    .bi-top-bar {
+      padding:5px 16px;
+      background:rgba(233,69,96,.12);
+      border-bottom:1px solid rgba(233,69,96,.3);
+      font-family:'Cinzel',serif;
+      font-size:.6rem; letter-spacing:3px; color:#e94560;
+      text-align:center; text-transform:uppercase;
+    }
+    .bi-fighters {
+      display:flex; align-items:center; justify-content:center;
+      gap:16px; padding:24px 20px 10px;
+    }
+    .bi-fighter {
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      flex:1;
+    }
+    .bi-portrait-wrap {
+      width:88px; height:88px; border-radius:50%;
+      overflow:hidden; border:3px solid transparent;
+      background:rgba(255,255,255,.04);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .bi-portrait-wrap.hero-side  { border-color:rgba(240,192,64,.7);  box-shadow:0 0 20px rgba(240,192,64,.3);  }
+    .bi-portrait-wrap.boss-side  { border-color:rgba(233,69,96,.7);   box-shadow:0 0 20px rgba(233,69,96,.3);  }
+    .bi-portrait-wrap img { width:100%; height:100%; object-fit:cover; }
+    .bi-portrait-fallback { font-size:2.4rem; line-height:1; }
+    .bi-name  { font-family:'Cinzel',serif; font-size:.82rem; font-weight:700; color:var(--text); text-align:center; }
+    .bi-title { font-size:.65rem; color:var(--subtext); text-align:center; margin-top:-4px; }
+    .bi-lv {
+      font-family:'Rajdhani',sans-serif; font-size:.72rem; font-weight:900;
+      letter-spacing:1px; padding:3px 10px; border-radius:20px;
+      text-align:center;
+    }
+    .bi-lv.hero-lv { background:rgba(240,192,64,.15); color:var(--gold); border:1px solid rgba(240,192,64,.4); }
+    .bi-lv.boss-lv { background:rgba(233,69,96,.15);  color:#ff7090;     border:1px solid rgba(233,69,96,.4); }
+
+    .bi-vs-col {
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+      flex-shrink:0;
+    }
+    .bi-vs-word {
+      font-family:'Cinzel',serif; font-size:1.6rem; font-weight:900;
+      color:#e94560; text-shadow:0 0 20px rgba(233,69,96,.7);
+      letter-spacing:3px;
+    }
+    .bi-equal-badge {
+      font-size:.58rem; font-weight:900; letter-spacing:1px;
+      padding:2px 8px; border-radius:8px;
+      background:rgba(240,192,64,.15); border:1px solid rgba(240,192,64,.4);
+      color:var(--gold);
+    }
+
+    .bi-story-text {
+      margin:0 24px 20px;
+      font-family:'Rajdhani',sans-serif; font-size:.88rem; line-height:1.6;
+      color:rgba(255,255,255,.75); text-align:center;
+    }
+    .bi-story-text em { color:var(--gold); font-style:normal; font-weight:700; }
+
+    .bi-actions {
+      display:flex; gap:10px; padding:0 24px 24px;
+      justify-content:center;
+    }
+    .bi-btn-fight {
+      flex:1; padding:13px 0;
+      font-family:'Cinzel',serif; font-size:.85rem; font-weight:700;
+      letter-spacing:2px; border:none; border-radius:10px; cursor:pointer;
+      background:linear-gradient(135deg,#c0002a,#e94560,#ff6080);
+      color:#fff; box-shadow:0 4px 20px rgba(233,69,96,.4);
+      transition:all .18s;
+    }
+    .bi-btn-fight:hover { transform:translateY(-2px); box-shadow:0 6px 28px rgba(233,69,96,.6); }
+    .bi-btn-back {
+      padding:13px 20px;
+      font-family:'Cinzel',serif; font-size:.75rem; font-weight:700;
+      letter-spacing:1px; border:1px solid rgba(255,255,255,.15);
+      border-radius:10px; cursor:pointer;
+      background:rgba(255,255,255,.04); color:rgba(255,255,255,.55);
+      transition:all .18s;
+    }
+    .bi-btn-back:hover { background:rgba(255,255,255,.08); color:rgba(255,255,255,.8); }
+
+    .stage-lock-overlay {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.4rem; border-radius:8px;
+      background:rgba(0,0,0,.28);
+    }
+    .stage-next-badge {
+      position:absolute; top:5px; right:5px;
+      font-size:.55rem; font-weight:900; letter-spacing:.5px;
+      padding:2px 5px; border-radius:4px;
+      background:var(--gold); color:#000;
+    }
+    .boss-crown {
+      position:absolute; top:5px; left:5px;
+      font-size:.9rem;
+    }
+
+    /* ── SKILL UNLOCK STRIP ── */
+    .skill-unlock-strip {
+      display:flex; align-items:center; gap:8px;
+      padding:10px 14px;
+      background:rgba(240,192,64,.04);
+      border-top:1px solid rgba(240,192,64,.1);
+      flex-wrap:wrap;
+    }
+    .su-label { font-size:.65rem; color:var(--subtext); letter-spacing:1px; text-transform:uppercase; flex-shrink:0; }
+    .su-skill {
+      display:flex; align-items:center; gap:5px;
+      padding:4px 10px; border-radius:20px;
+      font-size:.72rem; font-weight:700;
+    }
+    .su-skill img  { width:20px; height:20px; border-radius:4px; object-fit:cover; }
+    .su-skill-fb   { width:20px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.85rem; }
+    .su-unlocked   { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15); color:var(--text); }
+    .su-locked     { background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); color:var(--subtext); opacity:.5; }
+
+    /* ── NO HERO ── */
+    .no-hero-warn {
+      max-width:460px; margin:60px auto; text-align:center;
+      padding:36px; background:rgba(8,8,18,.9);
+      border:1px solid var(--border); border-radius:12px;
+    }
+    .no-hero-warn h3 { font-family:'Cinzel',serif; color:var(--gold); margin-bottom:10px; }
+    .no-hero-warn p  { color:var(--subtext); font-size:.88rem; margin-bottom:18px; }
+
+    /* progress bar in header */
+    .ch-prog-bar { height:4px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; margin-top:5px; }
+    .ch-prog-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,#a06800,#f0c040); transition:width .6s; }
+
+
+    /* ============================================================
+   MOBILE NAVBAR — NO HAMBURGER
+   Same layout as Dashboard / Characters / Leaderboard
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .navbar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px 10px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .navbar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Logo */
+  .navbar-logo {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+  }
+
+  .navbar-logo span {
+    font-size: .72rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* DIRECT NAVIGATION */
+  .navbar-links {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    gap: 4px !important;
+    overflow: visible !important;
+  }
+
+  .navbar-links .nav-btn {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 7px 9px !important;
+    font-size: .68rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* USER / SCORE / LOGOUT */
+  .nav-user {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .nav-user > span {
+    display: none !important;
+  }
+
+  .nav-score {
+    display: inline-flex !important;
+    align-items: center !important;
+    font-size: .68rem !important;
+    white-space: nowrap !important;
+  }
+
+  .nav-user .nav-btn.danger {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+
+    padding: 7px 9px !important;
+    font-size: .68rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* COMPLETELY REMOVE HAMBURGER */
+  .nav-hamburger {
+    display: none !important;
+  }
+
+  /* COMPLETELY REMOVE MOBILE DRAWER */
+  .nav-mobile-drawer {
+    display: none !important;
+  }
+}
+
+
+/* SMALL PHONE */
+@media (max-width: 560px) {
+
+  .navbar {
+    padding: 7px 8px !important;
+    gap: 6px !important;
+  }
+
+  .navbar-logo span {
+    font-size: .62rem !important;
+    letter-spacing: 1px !important;
+  }
+
+  .navbar-links {
+    gap: 2px !important;
+  }
+
+  .navbar-links .nav-btn,
+  .nav-user .nav-btn.danger {
+    padding: 6px 7px !important;
+    font-size: .61rem !important;
+  }
+
+  .nav-score {
+    font-size: .61rem !important;
+  }
+}
+  </style>
+<script>
+(function(){
+  try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function(){}); } catch(e) {}
+})();
+</script>
+</head>
+<body class="story-page">
+<div class="bg-particles"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-logo"><span>TENFOLD LEGENDS</span></div>
+  <div class="navbar-links">
+    <button class="nav-btn" onclick="location.href='dashboard.html'">Dashboard</button>
+    <button class="nav-btn" onclick="location.href='characters.html'">Heroes</button>
+    <button class="nav-btn active">Story Mode</button>
+    <button class="nav-btn" onclick="goArena()">Arena</button>
+    <button class="nav-btn" onclick="location.href='leaderboard.html'">Leaderboard</button>
+  </div>
+  <div class="nav-user">
+    <span>Welcome, <span class="username" id="nav-username">—</span></span>
+    <div class="nav-score">🏆 <span id="nav-score">0</span> pts</div>
+    <button class="nav-btn danger btn-sm" onclick="Game.logout()">Logout</button>
+  </div>
+</nav>
+<div class="story-banner">
+  <div class="story-banner-title">📖 STORY MODE</div>
+  <div class="story-banner-sub">✦ THE LEGEND OF THE TEN ✦</div>
+  <div class="story-stats-row">
+    <div class="sstat-box"><div class="sstat-val" id="stat-stages">0</div><div class="sstat-lbl">Stages Cleared</div></div>
+    <div class="sstat-box"><div class="sstat-val" id="stat-stars">0</div><div class="sstat-lbl">Stars Earned</div></div>
+    <div class="sstat-box"><div class="sstat-val" id="stat-skills">0</div><div class="sstat-lbl">Skills Unlocked</div></div>
+    <div class="sstat-box"><div class="sstat-val" id="stat-chapters">0/10</div><div class="sstat-lbl">Chapters Done</div></div>
+  </div>
+</div>
+
+<!-- SELECTED HERO BAR -->
+<div class="hero-bar" id="hero-bar">
+  <div class="hb-left" id="hb-hero-info">
+    <div style="color:var(--subtext);font-size:.88rem;font-style:italic;">No hero selected</div>
+  </div>
+  <button class="btn btn-outline btn-sm" onclick="location.href='characters.html'">⚔ Change Hero</button>
+</div>
+
+<!-- SKILL UNLOCK LEGEND -->
+<div class="unlock-legend" style="margin-top:14px;">
+  <div class="ul-item"><div class="ul-dot" style="background:#aaa;font-size:.6rem;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;">1</div>Stage 1 — Unlock Basic Skill (Chapter's Hero)</div>
+  <div class="ul-item"><div class="ul-dot" style="background:#66aaff;font-size:.6rem;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;">3</div>Stage 3 — Unlock Special Skill (Chapter's Hero)</div>
+  <div class="ul-item"><div class="ul-dot" style="background:var(--gold);font-size:.6rem;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;">4</div>Stage 4 — Unlock Ultimate Skill (Chapter's Hero)</div>
+  <div class="ul-item"><div class="ul-dot" style="background:#ff7090;"></div>Stage 5 — BOSS → Unlock Next Hero</div>
+</div>
+
+<!-- NO HERO WARNING -->
+<div id="no-hero-section" style="display:none;">
+  <div class="no-hero-warn">
+    <h3>⚔ No Hero Selected</h3>
+    <p>Select a hero before entering Story Mode battles.</p>
+    <button class="btn btn-gold" onclick="location.href='characters.html'">Choose Your Legend</button>
+  </div>
+</div>
+
+<!-- CHAPTERS -->
+<div class="chapters-wrap" id="chapters-wrap"></div>
+
+<!-- PRE-BOSS STORY INTRO MODAL -->
+<div id="boss-intro-overlay">
+  <div class="boss-intro-box">
+    <div class="bi-top-bar" id="bi-top-bar">⚔ BOSS ENCOUNTER</div>
+
+    <!-- Fighter portraits -->
+    <div class="bi-fighters">
+      <div class="bi-fighter" id="bi-hero-col">
+        <div class="bi-portrait-wrap hero-side" id="bi-hero-portrait-wrap">
+          <div class="bi-portrait-fallback" id="bi-hero-fallback">⚔</div>
+        </div>
+        <div class="bi-name"  id="bi-hero-name">—</div>
+        <div class="bi-title" id="bi-hero-title">—</div>
+        <div class="bi-lv hero-lv" id="bi-hero-lv">Lv —</div>
+      </div>
+
+      <div class="bi-vs-col">
+        <div class="bi-vs-word">VS</div>
+        <div class="bi-equal-badge">⚖ EQUAL POWER</div>
+      </div>
+
+      <div class="bi-fighter" id="bi-boss-col">
+        <div class="bi-portrait-wrap boss-side" id="bi-boss-portrait-wrap">
+          <div class="bi-portrait-fallback" id="bi-boss-fallback">👑</div>
+        </div>
+        <div class="bi-name"  id="bi-boss-name">—</div>
+        <div class="bi-title" id="bi-boss-title">—</div>
+        <div class="bi-lv boss-lv" id="bi-boss-lv">Lv —</div>
+      </div>
+    </div>
+
+    <!-- Story text -->
+    <p class="bi-story-text" id="bi-story-text">The final trial awaits.</p>
+
+    <!-- Buttons -->
+    <div class="bi-actions">
+      <button class="bi-btn-back" onclick="closeBossIntro()">← Back</button>
+      <button class="bi-btn-fight" id="bi-fight-btn" onclick="confirmBossFight()">⚔ ENTER THE BATTLE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="game.js"></script>
+<script>
+// ── GUARD ─────────────────────────────────────────────────────
+if (!Game.requireLogin()) { /* redirected */ }
+const user           = Game.user;
+
+Game.syncScore().then((score) => {
+  if (score === null) return;
+  user.totalScore = score;
+  const nav = document.getElementById('nav-score');
+  if (nav) nav.textContent = score;
+});
+const selectedHeroId = Game.getSelectedHero();
+document.getElementById('nav-username').textContent = user.username;
+document.getElementById('nav-score').textContent    = user.totalScore || 0;
+
+// ══════════════════════════════════════════════════════════════
+// CHAPTER STRUCTURE
+// 10 chapters, 1 per hero, 5 stages per chapter
+// Same hero is the enemy for all 5 stages, escalating level
+// Stage 5 = BOSS (higher level + boosted stats)
+// ══════════════════════════════════════════════════════════════
+const CHAPTERS = [
+  { heroId:'aeron',  chNum:1,  title:"Aeron's Trial",         icon:'🔥',
+    desc:'The Flame Knight stands at the gates. Prove yourself worthy by defeating the Flameborn.',
+    stages:[
+      { stageNum:1, name:'Flame Imp Hollow',   enemyId:'flame_imp',       enemyLv:1,  isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Ash Wolf Den',       enemyId:'ash_wolf',        enemyLv:2,  isBoss:false, unlock:null        },
+      { stageNum:3, name:'Inferno Pass',       enemyId:'magma_scorcher',  enemyLv:3,  isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Phoenix Descent',    enemyId:'pyro_wraith',     enemyLv:4,  isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Lirael',       enemyId:'lirael',          enemyLv:5,  isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'lyra',   chNum:2,  title:"Lyra's Blizzard",        icon:'❄️',
+    desc:'The Frostblade haunts the frozen peaks. Survive the cold and shatter her ice.',
+    stages:[
+      { stageNum:1, name:'Frost Entrance',   enemyId:'frostling_brawler',  enemyLv:6,  isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Blizzard Trail',   enemyId:'glacier_golem',      enemyLv:7,  isBoss:false, unlock:null        },
+      { stageNum:3, name:'Crystal Cavern',   enemyId:'chillwind_sprite',   enemyLv:8,  isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Glacier Summit',   enemyId:'frostbite_phantom',  enemyLv:9,  isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Kaelen',     enemyId:'kaelen',             enemyLv:10, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'kael',   chNum:3,  title:"Kael's Storm",           icon:'⚡',
+    desc:'Lightning tears through the storm sky. Face the Storm Hunter on his own battlefield.',
+    stages:[
+      { stageNum:1, name:'Storm Approach',   enemyId:'storm_goblin',    enemyLv:11, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Thunder Road',     enemyId:'thunder_brute',   enemyLv:12, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Lightning Spire',  enemyId:'tempest_archer',  enemyLv:13, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Eye of the Storm', enemyId:'sky_reaper',      enemyLv:14, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Zephyron',   enemyId:'zephyron',        enemyLv:15, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'riven',  chNum:4,  title:"Riven's Fortress",       icon:'🌍',
+    desc:'The Earthbreaker guards the mountain pass. Crack through his stone defenses.',
+    stages:[
+      { stageNum:1, name:'Rocky Foothills',  enemyId:'dust_golem',        enemyLv:16, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Boulder Fields',   enemyId:'gale_harrier',      enemyLv:17, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Iron Ramparts',    enemyId:'sky_rift_falcon',   enemyLv:18, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Mountain Throne',  enemyId:'zephyr_sentinel',   enemyLv:19, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Zephyrus',   enemyId:'zephyrus',          enemyLv:20, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'selene', chNum:5,  title:"Selene's Moon Hunt",     icon:'✨',
+    desc:'Under the full moon, the Moon Archer hunts all who trespass in her sacred vale.',
+    stages:[
+      { stageNum:1, name:'Moonlit Clearing', enemyId:'glint_sprite',      enemyLv:21, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Silver Forest',    enemyId:'moonlit_stalker',   enemyLv:22, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Star Shrine',      enemyId:'lunar_warden',      enemyLv:23, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Lunar Altar',      enemyId:'eclipse_phantom',   enemyLv:24, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Lumina',     enemyId:'lumina',            enemyLv:25, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'draven', chNum:6,  title:"Draven's Shadow",        icon:'🌑',
+    desc:'The Shadow Fang strikes from darkness. Trust nothing — he is always watching.',
+    stages:[
+      { stageNum:1, name:'Dark Alleys',      enemyId:'gloom_bat',              enemyLv:26, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Shadow Maze',      enemyId:'shadow_prowler',         enemyLv:27, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Nightmare Arena',  enemyId:'draven_abyssal_guard',   enemyLv:28, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Void Corridor',    enemyId:'nightmare_assassin',     enemyLv:29, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Malakor',    enemyId:'malakor',                enemyLv:30, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'mira',   chNum:7,  title:"Mira's Deep",            icon:'💧',
+    desc:'The Tidecaller controls the ocean\'s fury. Breach her watery domain or be swept away.',
+    stages:[
+      { stageNum:1, name:'Tidal Shore',      enemyId:'tide_elemental',    enemyLv:31, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Coral Ruins',      enemyId:'coral_scuttler',    enemyLv:32, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Underwater Trench',enemyId:'mira_abyssal_guard',enemyLv:33, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Abyssal Gate',     enemyId:'deep_sea_siren',    enemyLv:34, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Leviathan',  enemyId:'leviathan',         enemyLv:35, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'orion',  chNum:8,  title:"Orion's Tempest",         icon:'🌪️',
+    desc:'The Stormcaller rides the wind above the clouds. Race to keep up or be left behind.',
+    stages:[
+      { stageNum:1, name:'Gale Crossing',    enemyId:'gale_wisplet',      enemyLv:36, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Windswept Plains', enemyId:'zephyr_stalker',    enemyLv:37, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Storm Vortex',     enemyId:'skyward_guard',     enemyLv:38, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Eye of the Gale',  enemyId:'aero_phantom',      enemyLv:39, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Boreas',     enemyId:'boreas',            enemyLv:40, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'brutus', chNum:9,  title:"Brutus's Iron Siege",    icon:'⚙️',
+    desc:'The Iron Guardian and his army crush all resistance. Break through the iron wall.',
+    stages:[
+      { stageNum:1, name:'Iron Gate',        enemyId:'scrap_scuttler',      enemyLv:41, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Siege Courtyard',  enemyId:'ironhide_hound',      enemyLv:42, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Armory Hall',      enemyId:'steel_sentinel',      enemyLv:43, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'War Throne Room',  enemyId:'forged_executioner',  enemyLv:44, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'BOSS: Valkor',     enemyId:'valkor',              enemyLv:45, isBoss:true,  unlock:'next'     },
+    ]
+  },
+  { heroId:'elysia', chNum:10, title:"FINAL: Elysia's Celestial Tower", icon:'🔮',
+    desc:'The Celestial Mage channels the full power of the cosmos. The final legend. The ultimate test.',
+    stages:[
+      { stageNum:1, name:'Arcane Foyer',         enemyId:'astral_sprite',     enemyLv:46, isBoss:false, unlock:'basic'    },
+      { stageNum:2, name:'Mana Chambers',         enemyId:'starlight_prowler', enemyLv:47, isBoss:false, unlock:null        },
+      { stageNum:3, name:'Spell Gallery',         enemyId:'celestial_guard',   enemyLv:48, isBoss:false, unlock:'special'  },
+      { stageNum:4, name:'Celestial Core',        enemyId:'cosmic_phantom',    enemyLv:49, isBoss:false, unlock:'ultimate' },
+      { stageNum:5, name:'FINAL BOSS: Astralis',  enemyId:'astralis',          enemyLv:50, isBoss:true,  unlock:'complete' },
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════════════
+// PROGRESS & SKILL UNLOCKS — stored in safeLocalStorage
+// ══════════════════════════════════════════════════════════════
+// progress key:  "ch{N}_st{N}" → { completed, stars }
+// skill unlocks: "tenfold_skills_{userID}" → { aeron: ['basic'], lyra: [], ... }
+// hero unlocks:  "tenfold_unlocked_{userID}" → ['aeron','lyra',...]
+
+let progress     = JSON.parse(safeLocalStorage.getItem('tenfold_story_'   + user.userID) || '{}');
+let skillUnlocks = JSON.parse(safeLocalStorage.getItem('tenfold_skills_'  + user.userID) || '{}');
+let heroUnlocks  = JSON.parse(safeLocalStorage.getItem('tenfold_unlocked_'+ user.userID) || '["aeron"]');
+
+function storyKey(ch, st) { return `ch${ch}_st${st}`; }
+function isCleared(ch, st){ return !!(progress[storyKey(ch,st)]?.completed); }
+function getStars(ch,  st){ return progress[storyKey(ch,st)]?.stars || 0; }
+
+function isStageUnlocked(ch, st) {
+  if (Game.isAdmin()) return true; // admins can access all stages
+  if (ch===1 && st===1) return true;
+  if (st===1) return isChapterUnlocked(ch);
+  return isCleared(ch, st-1);
+}
+function isChapterUnlocked(ch) {
+  if (Game.isAdmin()) return true; // admins can access all chapters
+  if (ch===1) return true;
+  // Previous chapter boss (stage 5) must be cleared
+  return isCleared(ch-1, 5);
+}
+
+// Which skills are unlocked for a hero
+function getHeroSkillUnlocks(heroId) {
+  return skillUnlocks[heroId] || [];
+}
+function hasSkill(heroId, type) {
+  // In arena mode, treat all skills as unlocked
+  // In story mode, check unlock
+  const ul = getHeroSkillUnlocks(heroId);
+  return ul.includes(type);
+}
+
+// Called after clearing a stage
+function processUnlock(chapterObj, stageObj) {
+  const heroId  = chapterObj.heroId;
+  const type    = stageObj.unlock;
+  let newUnlock = null;
+
+  if (!skillUnlocks[heroId]) skillUnlocks[heroId] = [];
+
+  if (type === 'basic' || type === 'special' || type === 'ultimate') {
+    if (!skillUnlocks[heroId].includes(type)) {
+      skillUnlocks[heroId].push(type);
+      newUnlock = `${HEROES[heroId].name}'s ${type.charAt(0).toUpperCase()+type.slice(1)} Skill unlocked!`;
+      safeLocalStorage.setItem('tenfold_skills_' + user.userID, JSON.stringify(skillUnlocks));
+      apiCall({ action:'unlockChar', userID:user.userID, heroID:heroId }); // save to sheet too
+    }
+  } else if (type === 'next') {
+    // Unlock next chapter's hero
+    const nextChapter = CHAPTERS.find(c => c.chNum === chapterObj.chNum + 1);
+    if (nextChapter && !heroUnlocks.includes(nextChapter.heroId)) {
+      heroUnlocks.push(nextChapter.heroId);
+      safeLocalStorage.setItem('tenfold_unlocked_' + user.userID, JSON.stringify(heroUnlocks));
+      apiCall({ action:'unlockChar', userID:user.userID, heroID:nextChapter.heroId });
+      newUnlock = `${HEROES[nextChapter.heroId].name} UNLOCKED!`;
+    }
+  } else if (type === 'complete') {
+    newUnlock = '🏆 STORY COMPLETE! You have conquered all 10 Legends!';
+  }
+
+  return newUnlock;
+}
+
+// ══════════════════════════════════════════════════════════════
+// COMPUTE STATS
+// ══════════════════════════════════════════════════════════════
+function computeStats() {
+  let totalStages=0, totalStars=0, chapsDone=0, skillsDone=0;
+  CHAPTERS.forEach(ch => {
+    let allDone = true;
+    ch.stages.forEach(st => {
+      if (isCleared(ch.chNum, st.stageNum)) { totalStages++; totalStars+=getStars(ch.chNum,st.stageNum); }
+      else allDone = false;
+    });
+    if (allDone) chapsDone++;
+  });
+  Object.values(skillUnlocks).forEach(arr => { skillsDone += arr.length; });
+  document.getElementById('stat-stages').textContent   = totalStages;
+  document.getElementById('stat-stars').textContent    = totalStars;
+  document.getElementById('stat-skills').textContent   = skillsDone;
+  document.getElementById('stat-chapters').textContent = `${chapsDone}/10`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// HERO BAR
+// ══════════════════════════════════════════════════════════════
+function renderHeroBar() {
+  const info = document.getElementById('hb-hero-info');
+  if (!selectedHeroId || !HEROES[selectedHeroId]) {
+    info.innerHTML = `<div style="color:var(--subtext);font-size:.88rem;font-style:italic;">No hero — <a href="characters.html">choose one</a></div>`;
+    return;
+  }
+  const h  = HEROES[selectedHeroId];
+  const ph = h.sprites.portrait
+    ? `<img src="${h.sprites.portrait}" class="hb-portrait" alt="${h.name}" onerror="this.onerror=null;this.src='';this.className='hb-portrait-fb';this.style.display='flex';">`
+    : `<div class="hb-portrait-fb">${ELEMENT_ICONS[h.element]}</div>`;
+  info.innerHTML = `
+    ${ph}
+    <div>
+      <div class="hb-name">${h.name} · ${h.title}</div>
+      <div class="hb-sub">${ELEMENT_ICONS[h.element]} ${h.element} · ${h.fightingStyle}</div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// STAR HTML
+// ══════════════════════════════════════════════════════════════
+function starsHTML(n) {
+  return [1,2,3].map(i=>`<span class="stage-star ${i<=n?'on':'off'}">★</span>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// BUILD SKILL UNLOCK STRIP (per chapter)
+// ══════════════════════════════════════════════════════════════
+function skillStripHTML(heroId) {
+  const h  = HEROES[heroId];
+  const ul = getHeroSkillUnlocks(heroId);
+  const skills = [
+    { type:'basic',    label:'Basic',    icon: h.skills.basic.icon,    emoji:'⚔'  },
+    { type:'special',  label:'Special',  icon: h.skills.special.icon,  emoji:'✨' },
+    { type:'ultimate', label:'Ultimate', icon: h.skills.ultimate.icon, emoji:'💥' },
+  ];
+  const items = skills.map(sk => {
+    const unlocked = ul.includes(sk.type);
+    const iconHtml = sk.icon
+      ? `<img src="${sk.icon}" class="su-skill-fb" alt="${sk.label}" onerror="this.onerror=null;this.src='';this.textContent='${sk.emoji}';">`
+      : `<span class="su-skill-fb">${sk.emoji}</span>`;
+    return `
+      <div class="su-skill ${unlocked ? 'su-unlocked' : 'su-locked'}" title="${h.skills[sk.type].name}">
+        ${iconHtml}
+        ${h.skills[sk.type].name}
+        ${unlocked ? '✓' : '🔒'}
+      </div>`;
+  }).join('');
+  return `
+    <div class="skill-unlock-strip">
+      <span class="su-label">Skills:</span>
+      ${items}
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// UNLOCK BADGE PER STAGE
+// ══════════════════════════════════════════════════════════════
+function unlockBadgeHTML(stageObj, heroId) {
+  if (!stageObj.unlock) return '';
+  // Skill unlocks (basic/special/ultimate) only exist on Chapter 1 stages.
+  // Chapters 2-10 only carry unlock:'next' (boss) or unlock:'complete' (Ch.10 boss).
+  const ul = getHeroSkillUnlocks(heroId);
+
+  if (stageObj.unlock === 'basic') {
+    const done = ul.includes('basic');
+    return `<div class="stage-unlock-badge ${done?'sub-basic':'sub-locked-badge'}">${done?'✓':'🔒'} Basic Skill</div>`;
+  }
+  if (stageObj.unlock === 'special') {
+    const done = ul.includes('special');
+    return `<div class="stage-unlock-badge ${done?'sub-special':'sub-locked-badge'}">${done?'✓':'🔒'} Special Skill</div>`;
+  }
+  if (stageObj.unlock === 'ultimate') {
+    const done = ul.includes('ultimate');
+    return `<div class="stage-unlock-badge ${done?'sub-ultimate':'sub-locked-badge'}">${done?'✓':'🔒'} Ultimate Skill</div>`;
+  }
+  if (stageObj.unlock === 'next') {
+    const ch      = CHAPTERS.find(c=>c.heroId===heroId);
+    const nextCh  = CHAPTERS.find(c=>c.chNum===(ch?.chNum||1)+1);
+    if (!nextCh) return '';
+    const done    = heroUnlocks.includes(nextCh.heroId);
+    return `<div class="stage-unlock-badge ${done?'sub-hero':'sub-locked-badge'}">${done?'✓':'🔒'} Unlock ${HEROES[nextCh.heroId].name}</div>`;
+  }
+  if (stageObj.unlock === 'complete') {
+    return `<div class="stage-unlock-badge sub-hero">👑 Final Boss</div>`;
+  }
+  return '';
+}
+
+// ══════════════════════════════════════════════════════════════
+// BUILD CHAPTERS
+// ══════════════════════════════════════════════════════════════
+function buildChapters() {
+  const wrap = document.getElementById('chapters-wrap');
+  wrap.innerHTML = '';
+
+  CHAPTERS.forEach((ch, ci) => {
+    const unlocked  = isChapterUnlocked(ch.chNum);
+    const stagesDone= ch.stages.filter(st=>isCleared(ch.chNum,st.stageNum)).length;
+    const totalStars= ch.stages.reduce((a,st)=>a+getStars(ch.chNum,st.stageNum),0);
+    const allDone   = stagesDone===ch.stages.length;
+    const isFinal   = ch.chNum===10;
+    const pct       = Math.round(stagesDone/ch.stages.length*100);
+    const h         = HEROES[ch.heroId];
+
+    const card = document.createElement('div');
+    card.className = `chapter-card ${unlocked?'unlocked':'locked'} ${allDone?'ch-complete':''} ${isFinal?'ch-final':''}`;
+    card.id = `ch-${ch.chNum}`;
+
+    // Hero portrait for chapter header
+    const portraitHtml = h.sprites.portrait
+      ? `<img src="${h.sprites.portrait}" class="ch-hero-portrait" alt="${h.name}" onerror="this.onerror=null;this.src='';this.className='ch-hero-portrait-fb';">`
+      : `<div class="ch-hero-portrait-fb">${ELEMENT_ICONS[h.element]}</div>`;
+
+    // Stages HTML
+    let stagesHTML = '<div class="stages-divider">STAGES</div><div class="stages-row">';
+    ch.stages.forEach((st, si) => {
+      const cleared    = isCleared(ch.chNum, st.stageNum);
+      const accessible = isStageUnlocked(ch.chNum, st.stageNum) && unlocked;
+      const isNext     = accessible && !cleared && si===stagesDone;
+      const stars      = getStars(ch.chNum, st.stageNum);
+      const lvls       = JSON.parse(safeLocalStorage.getItem('tenfold_levels_'+user.userID)||'{}');
+      const playerLv   = lvls[selectedHeroId]||1;
+
+      let cls = 'stage-btn';
+      if (!accessible)     cls += ' stage-locked';
+      else if (cleared)    cls += ' stage-done';
+      else if (isNext)     cls += ' stage-next';
+      if (st.isBoss)       cls += ' stage-boss';
+
+      const diffColor = st.isBoss ? '#e94560' : st.stageNum>=4 ? '#ffaa44' : st.stageNum>=3 ? '#ffdd88' : 'var(--subtext)';
+      const diffLabel = st.isBoss ? '👑 BOSS' : st.stageNum>=4 ? 'Hard' : st.stageNum>=3 ? 'Medium' : 'Normal';
+
+      // Chapter-aware level milestones (mirrors battle.html CHAPTER_BOSS_LV)
+      const BOSS_LV_MAP = { 1:5, 2:10, 3:15, 4:20, 5:25, 6:30, 7:35, 8:40, 9:45, 10:50 };
+      const bossLv    = BOSS_LV_MAP[ch.chNum] || st.enemyLv;
+      const stOffsets = { 1:-4, 2:-3, 3:-2, 4:-1, 5:0 };
+      const heroLvAtStage = Math.max(1, bossLv + (stOffsets[st.stageNum] || 0));
+
+      // For boss stage: show the equal-power matchup; for other stages: show hero level milestone
+      const stageLvHTML = st.isBoss
+        ? `<div class="boss-lv-match"><span class="eq-icon">⚖</span> Lv ${bossLv} vs Lv ${bossLv}</div>`
+        : `<div class="stage-lv" style="color:${diffColor};font-size:.7rem;font-weight:700;">${diffLabel} · You → Lv${heroLvAtStage}</div>`;
+
+      stagesHTML += `
+        <div class="${cls}" onclick="clickStage(${ch.chNum}, ${st.stageNum}, '${st.enemyId||ch.heroId}', '${st.name}', ${accessible}, ${st.isBoss}, ${st.enemyLv})">
+          ${isNext ? '<div class="stage-next-badge">NEXT</div>' : ''}
+          ${st.isBoss ? '<div class="boss-crown">👑</div>' : ''}
+          <div class="stage-num">STAGE ${st.stageNum}</div>
+          <div class="stage-name">${st.name}</div>
+          ${stageLvHTML}
+          <div class="stage-stars">${starsHTML(stars)}</div>
+          ${unlockBadgeHTML(st, ch.heroId)}
+          ${!accessible ? '<div class="stage-lock-overlay">🔒</div>' : ''}
+        </div>`;
+    });
+    stagesHTML += '</div>';
+
+    card.innerHTML = `
+      <div class="chapter-header" onclick="toggleCh(${ch.chNum}, ${unlocked})">
+        <div class="ch-num">${String(ch.chNum).padStart(2,'0')}</div>
+        ${portraitHtml}
+        <div class="ch-info">
+          <div class="ch-title">${ch.icon} ${ch.title} ${isFinal?'<span style="font-size:.65rem;color:#ff7090;letter-spacing:2px;">— FINAL —</span>':''}</div>
+          <div class="ch-desc">${ch.desc}</div>
+          <div class="ch-meta">
+            <span class="ch-badge">${stagesDone}/5 Stages</span>
+            <span class="ch-badge" style="color:${h.color};border-color:${h.color}40;">${ELEMENT_ICONS[h.element]} ${h.element}</span>
+            <span class="ch-badge" style="color:#c8a8ff;border-color:rgba(200,168,255,0.4);font-weight:700;">⚔ USE: ${h.name}</span>
+            <span class="ch-badge" style="color:${unlocked?(allDone?'#44ff99':'var(--gold)'):'var(--subtext)'};">
+              ${unlocked ? (allDone?'✓ Complete':`${pct}% Done`) : '🔒 Locked'}
+            </span>
+            ${isFinal ? '<span class="ch-final-badge">👑 FINAL CHAPTER</span>' : ''}
+          </div>
+          <div class="ch-prog-bar"><div class="ch-prog-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="ch-right">
+          ${unlocked
+            ? `<div class="ch-stars-total">★ ${totalStars}/${ch.stages.length*3}</div>
+               <div class="ch-chevron">▼</div>`
+            : `<div class="ch-lock-icon">🔒</div>`}
+        </div>
+      </div>
+      <div class="chapter-stages">
+        ${skillStripHTML(ch.heroId)}
+        ${stagesHTML}
+      </div>`;
+
+    wrap.appendChild(card);
+
+    // Auto-open first incomplete chapter
+    if (unlocked && stagesDone < ch.stages.length && !document.querySelector('.chapter-card.open')) {
+      card.classList.add('open');
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// TOGGLE CHAPTER
+// ══════════════════════════════════════════════════════════════
+function toggleCh(num, unlocked) {
+  if (!unlocked && !Game.isAdmin()) { showToast('Clear the previous chapter boss to unlock this one!','info'); return; }
+  const card = document.getElementById(`ch-${num}`);
+  card.classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════════════════
+// CLICK STAGE → BATTLE
+// ══════════════════════════════════════════════════════════════
+// Pending boss-fight context (set when showing the intro modal)
+let _pendingBoss = null;
+
+function clickStage(chNum, stageNum, enemyId, stageName, accessible, isBoss, enemyLv) {
+  if (!accessible) { showToast('Clear the previous stage first!','info'); return; }
+
+  // Each chapter forces its own hero — find it from the CHAPTERS array
+  const chObj         = CHAPTERS.find(c => c.chNum === chNum);
+  const chapterHeroId = chObj ? chObj.heroId : (selectedHeroId || 'aeron');
+
+  // Force-select the chapter's hero so the player fights as the right character
+  Game.selectHero(chapterHeroId);
+
+  // ── BOSS STAGE: show cinematic intro modal first ──
+  if (isBoss) {
+    _pendingBoss = { chNum, stageNum, enemyId, stageName, enemyLv, chapterHeroId };
+    openBossIntro(chObj, chapterHeroId, enemyId, enemyLv, chNum);
+    return;
+  }
+
+  // Non-boss stage: go straight to battle
+  _launchBattle(chNum, stageNum, enemyId, stageName, isBoss, enemyLv, chapterHeroId);
+}
+
+function _launchBattle(chNum, stageNum, enemyId, stageName, isBoss, enemyLv, chapterHeroId) {
+  safeSessionStorage.setItem('tenfold_battle_mode',    'story');
+  safeSessionStorage.setItem('tenfold_battle_chapter', chNum);
+  safeSessionStorage.setItem('tenfold_battle_stage',   stageNum);
+  safeSessionStorage.setItem('tenfold_battle_enemy',   enemyId);
+  safeSessionStorage.setItem('tenfold_battle_name',    stageName);
+  safeSessionStorage.setItem('tenfold_battle_enemy_lv', enemyLv);
+  safeSessionStorage.setItem('tenfold_battle_is_boss',  isBoss ? '1' : '0');
+  safeSessionStorage.setItem('tenfold_battle_hero_id',  chapterHeroId);
+  safeSessionStorage.setItem('tenfold_battle_ch_obj', JSON.stringify({ chNum, heroId: enemyId }));
+  window.location.href = 'battle.html';
+}
+
+// ── BOSS INTRO MODAL ──────────────────────────────────────────
+// Per-chapter boss narrative lines
+const BOSS_INTROS = {
+  1:  { line: `The flames have forged you. Now stand before <em>Lirael</em> — The Phoenix Seraphim — and prove fire cannot be extinguished.` },
+  2:  { line: `The blizzard parts. <em>Kaelen</em>, The Corrupted Frostlord, rises from the ice. The cold you mastered now faces its true sovereign.` },
+  3:  { line: `Lightning crackles across the sky. <em>Zephyron</em>, The Tempest King, descends. Two storm-wielders. One will fall.` },
+  4:  { line: `The mountain shakes. <em>Zephyrus</em>, The Tempest Sovereign, emerges from the ruins. Earth against sky — the fortress will decide.` },
+  5:  { line: `The moon dims. <em>Lumina</em>, The Eclipse Empress, eclipses the light itself. Your arrows must fly true in total darkness.` },
+  6:  { line: `Every shadow in the citadel bends to one will. <em>Malakor</em>, The Void Lord, has been watching all along. There is no escape now.` },
+  7:  { line: `The ocean floor trembles. <em>Leviathan</em>, The Ocean Abyss, awakens. You have crossed his domain — now face his wrath.` },
+  8:  { line: `Above the clouds, the wind screams your name. <em>Boreas</em>, The Tempest Lord, commands the gale itself. Outlast the storm.` },
+  9:  { line: `Steel rings on steel. <em>Valkor</em>, The Steel Colossus, stands alone — the last wall between you and the final chapter.` },
+  10: { line: `The cosmos holds its breath. <em>Astralis</em>, The Cosmic Emperor — the sum of all ten legends — waits at the edge of creation. This is the end.` },
+};
+
+function openBossIntro(chObj, heroId, enemyId, enemyLv, chNum) {
+  const hero   = HEROES[heroId];
+  const boss   = STORY_ENEMIES[enemyId];
+  const BOSS_LV_MAP = { 1:5, 2:10, 3:15, 4:20, 5:25, 6:30, 7:35, 8:40, 9:45, 10:50 };
+  const bossLv = BOSS_LV_MAP[chNum] || enemyLv;
+
+  // Header
+  document.getElementById('bi-top-bar').textContent =
+    chNum === 10 ? '👑 FINAL BOSS ENCOUNTER' : `⚔ CHAPTER ${chNum} — BOSS ENCOUNTER`;
+
+  // Hero side
+  const heroPortraitWrap = document.getElementById('bi-hero-portrait-wrap');
+  heroPortraitWrap.innerHTML = '';
+  if (hero && hero.sprites && hero.sprites.portrait) {
+    const img = document.createElement('img');
+    img.src = hero.sprites.portrait; img.alt = hero.name;
+    img.onerror = () => { heroPortraitWrap.innerHTML = `<div class="bi-portrait-fallback">${ELEMENT_ICONS[hero.element]||'⚔'}</div>`; };
+    heroPortraitWrap.appendChild(img);
+  } else {
+    heroPortraitWrap.innerHTML = `<div class="bi-portrait-fallback">${hero ? (ELEMENT_ICONS[hero.element]||'⚔') : '⚔'}</div>`;
+  }
+  document.getElementById('bi-hero-name').textContent  = hero ? hero.name  : heroId;
+  document.getElementById('bi-hero-title').textContent = hero ? hero.title : '';
+  document.getElementById('bi-hero-lv').textContent    = `Lv ${bossLv}`;
+
+  // Boss side
+  const bossPortraitWrap = document.getElementById('bi-boss-portrait-wrap');
+  bossPortraitWrap.innerHTML = '';
+  if (boss && boss.sprites && boss.sprites.portrait) {
+    const img = document.createElement('img');
+    img.src = boss.sprites.portrait; img.alt = boss.name;
+    img.onerror = () => { bossPortraitWrap.innerHTML = `<div class="bi-portrait-fallback">👑</div>`; };
+    bossPortraitWrap.appendChild(img);
+  } else {
+    bossPortraitWrap.innerHTML = `<div class="bi-portrait-fallback">👑</div>`;
+  }
+  document.getElementById('bi-boss-name').textContent  = boss ? boss.name  : enemyId;
+  document.getElementById('bi-boss-title').textContent = boss ? boss.title : 'Boss';
+  document.getElementById('bi-boss-lv').textContent    = `Lv ${bossLv}`;
+
+  // Story line
+  const intro = BOSS_INTROS[chNum] || { line: 'The final guardian awaits.' };
+  document.getElementById('bi-story-text').innerHTML = intro.line;
+
+  // Show
+  document.getElementById('boss-intro-overlay').classList.add('show');
+}
+
+function closeBossIntro() {
+  document.getElementById('boss-intro-overlay').classList.remove('show');
+  _pendingBoss = null;
+}
+
+function confirmBossFight() {
+  if (!_pendingBoss) return;
+  const p = _pendingBoss;
+  document.getElementById('boss-intro-overlay').classList.remove('show');
+  _pendingBoss = null;
+  _launchBattle(p.chNum, p.stageNum, p.enemyId, p.stageName, true, p.enemyLv, p.chapterHeroId);
+}
+
+// ── GO ARENA (clears story session) ──────────────────────────
+function goArena() {
+  if (!Game.isAdmin()) {
+    const heroId   = Game.getSelectedHero() || 'aeron';
+    const skillUL  = JSON.parse(safeLocalStorage.getItem('tenfold_skills_' + user.userID) || '{}');
+    const heroSkills = (skillUL[heroId]) || [];
+    const hasAll   = ['basic', 'special', 'ultimate'].every(t => heroSkills.includes(t));
+    if (!hasAll) {
+      const CH_HERO_NUM = {aeron:1,lyra:2,kael:3,riven:4,selene:5,draven:6,mira:7,orion:8,brutus:9,elysia:10};
+      const chNum  = CH_HERO_NUM[heroId] || 1;
+      const hints  = { basic:`Ch.${chNum} St.1`, special:`Ch.${chNum} St.3`, ultimate:`Ch.${chNum} St.4` };
+      const missing = ['basic','special','ultimate'].filter(t => !heroSkills.includes(t));
+      const needed  = missing.map(t => hints[t]).join(', ');
+      showToast(`🔒 ${HEROES[heroId]?.name || heroId} skills not fully unlocked! Complete: ${needed}`, 'error');
+      return;
+    }
+  }
+  safeSessionStorage.setItem('tenfold_battle_mode', 'arena');
+  safeSessionStorage.removeItem('tenfold_battle_enemy');
+  safeSessionStorage.removeItem('tenfold_battle_enemy_lv');
+  safeSessionStorage.removeItem('tenfold_battle_chapter');
+  safeSessionStorage.removeItem('tenfold_battle_stage');
+  safeSessionStorage.removeItem('tenfold_battle_name');
+  safeSessionStorage.removeItem('tenfold_battle_is_boss');
+  safeSessionStorage.removeItem('tenfold_battle_ch_obj');
+  safeSessionStorage.removeItem('tenfold_battle_hero_id');
+  location.href = 'battle.html';
+}
+// ══════════════════════════════════════════════════════════════
+function checkBattleReturn() {
+  const returned = safeSessionStorage.getItem('tenfold_story_return');
+  if (!returned) return;
+  safeSessionStorage.removeItem('tenfold_story_return');
+
+  const { chNum, stageNum, won, stars } = JSON.parse(returned);
+  if (!won) return;
+
+  // Save progress
+  const key = storyKey(chNum, stageNum);
+  if (!progress[key] || stars > (progress[key].stars||0)) {
+    progress[key] = { completed: true, stars };
+    safeLocalStorage.setItem('tenfold_story_' + user.userID, JSON.stringify(progress));
+    apiCall({ action:'saveStory', userID:user.userID, chapter:chNum, stage:stageNum, stars });
+  }
+
+  // Process unlock
+  const chObj  = CHAPTERS.find(c => c.chNum === chNum);
+  const stObj  = chObj?.stages.find(s => s.stageNum === stageNum);
+  if (chObj && stObj) {
+    const msg = processUnlock(chObj, stObj);
+    if (msg) setTimeout(() => showToast(msg, 'success'), 500);
+  }
+
+  buildChapters();
+  computeStats();
+}
+
+// ══════════════════════════════════════════════════════════════
+// LOAD PROGRESS FROM API
+// ══════════════════════════════════════════════════════════════
+async function loadProgress() {
+  const res = await apiCall({ action:'getStory', userID:user.userID });
+  if (res.success && res.progress) {
+    res.progress.forEach(p => {
+      progress[storyKey(p.chapter, p.stage)] = { completed:p.completed, stars:p.stars||0 };
+    });
+    safeLocalStorage.setItem('tenfold_story_' + user.userID, JSON.stringify(progress));
+  }
+  buildChapters();
+  computeStats();
+  return true;
+}
+
+// ══════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(()=>{ t.className='toast'; }, 3500);
+}
+
+// ══════════════════════════════════════════════════════════════
+// AUTO-LAUNCH NEXT STAGE (from "Next Stage" button in battle.html)
+// ══════════════════════════════════════════════════════════════
+function checkAutoNext() {
+  const raw = safeSessionStorage.getItem('tenfold_story_autonext');
+  if (!raw) return false;
+  safeSessionStorage.removeItem('tenfold_story_autonext');
+
+  const { chNum, stageNum } = JSON.parse(raw);
+  const chObj = CHAPTERS.find(c => c.chNum === chNum);
+  const stObj = chObj?.stages.find(s => s.stageNum === stageNum);
+  if (!chObj || !stObj) return false;
+
+  // Check if this stage is now accessible (previous stage was just cleared)
+  const accessible = isChapterUnlocked(chNum) && isStageUnlocked(chNum, stageNum);
+  if (!accessible) {
+    showToast('Next stage is not yet unlocked!', 'info');
+    return false;
+  }
+
+  // Launch the next battle immediately
+  clickStage(chNum, stageNum, stObj.enemyId || chObj.heroId, stObj.name, true, stObj.isBoss, stObj.enemyLv);
+  return true;
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+renderHeroBar();
+if (!selectedHeroId) document.getElementById('no-hero-section').style.display = 'block';
+checkBattleReturn();
+loadProgress().then(() => {
+  checkAutoNext();
+});
+</script>
+
+<style>#tfl-connection{position:fixed;right:10px;bottom:10px;z-index:99999;font:600 11px Arial,sans-serif;padding:5px 8px;border:1px solid rgba(240,192,64,.35);border-radius:12px;background:rgba(5,5,15,.82);color:#aaa;pointer-events:none;opacity:.8}</style>
+<div id="tfl-connection">● ONLINE</div>
+<script>(function(){function u(){var e=document.getElementById('tfl-connection');if(!e)return;e.textContent=navigator.onLine?'● ONLINE':'● OFFLINE';e.style.color=navigator.onLine?'#7ee787':'#ffcc66';}window.addEventListener('online',u);window.addEventListener('offline',u);u();})();</script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="preload" href="https://res.cloudinary.com/jtrgd4x8/image/upload/f_auto,q_auto/background" as="image"/>
+  <title>Tenfold Legends: Rise of the Ten</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .login-bg-animated {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden;
+      background: #05050f;
+    }
+    .login-bg-animated img.bg-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .login-bg-animated::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1;
+    }
+    .login-page {
+      position: relative;
+      z-index: 1;
+    }
+    /* Make all branding text clearer over the bg */
+    .branding-10 {
+      text-shadow: 0 0 40px rgba(240,192,64,0.9), 0 2px 12px rgba(0,0,0,1) !important;
+    }
+    .branding-legends {
+      text-shadow: 0 2px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.8) !important;
+    }
+    .branding-rise, .login-branding p, .login-branding div {
+      text-shadow: 0 1px 6px rgba(0,0,0,1) !important;
+    }
+    /* Auth card — stronger background */
+    .auth-card {
+      background: rgba(4,4,14,0.97) !important;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(240,192,64,0.2) !important;
+    }
+    .embers { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+    .ember {
+      position: absolute; bottom: -10px;
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--gold); opacity: 0;
+      animation: emberRise linear infinite;
+    }
+    @keyframes emberRise {
+      0%   { opacity: 0;   transform: translateY(0) scale(1); }
+      10%  { opacity: 0.8; }
+      90%  { opacity: 0.3; }
+      100% { opacity: 0;   transform: translateY(-100vh) scale(0.3) translateX(var(--dx,0px)); }
+    }
+
+    .login-hero-showcase {
+      margin-top: 28px;
+      display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
+    }
+    .showcase-elem {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem; font-weight: 700;
+      border: 1px solid currentColor;
+      letter-spacing: 1px;
+    }
+
+    /* decorative lines */
+    .deco-line {
+      height: 1px; width: 120px; margin: 16px auto;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* auth form card */
+    .auth-card {
+      background: rgba(8,8,18,0.92);
+      border: 1px solid rgba(240,192,64,0.2);
+      border-radius: 12px;
+      padding: 32px 36px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(233,69,96,0.06);
+    }
+
+    .branding-10 {
+      font-family: 'Cinzel', serif;
+      font-size: 5rem; font-weight: 900;
+      background: linear-gradient(135deg, #c8960c 0%, #f0c040 40%, #fff8dc 60%, #f0c040 80%, #c8960c 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(240,192,64,0.9)) drop-shadow(0 3px 6px rgba(0,0,0,1));
+      letter-spacing: 6px;
+      line-height: 0.9;
+    }
+    .branding-legends {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 10px;
+      margin-top: 4px;
+      text-shadow: 0 0 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1);
+    }
+    .branding-rise {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem; color: #e8d89a;
+      letter-spacing: 6px; margin-top: 6px;
+      text-shadow: 0 1px 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,1);
+    }
+    .login-branding p {
+      color: #d8d0c0 !important;
+      text-shadow: 0 1px 6px rgba(0,0,0,1), 0 0 16px rgba(0,0,0,1) !important;
+    }
+    .login-branding .deco-line {
+      background: linear-gradient(90deg, transparent, #f0c040, transparent);
+      opacity: 0.9;
+    }
+
+    .hero-icons-row {
+      display: flex; gap: 8px; justify-content: center;
+      margin-top: 24px; flex-wrap: wrap;
+    }
+    .hero-icon-bubble {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      background: rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+    .hero-icon-bubble:hover { transform: scale(1.15); }
+/* =========================================================
+   PHONE LANDSCAPE
+   ========================================================= */
+@media screen and (orientation: landscape) and (max-height: 600px) {
+
+  .login-page {
+    min-height: 100dvh;
+    height: 100dvh;
+    padding: 6px 12px;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .login-container {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* LEFT BRANDING */
+  .login-branding {
+    width: 42%;
+    max-width: 360px;
+  }
+
+  .login-branding > div {
+    padding: 12px 14px !important;
+  }
+
+  .branding-10 {
+    font-size: 2.8rem !important;
+    letter-spacing: 3px !important;
+  }
+
+  .branding-legends {
+    font-size: 0.9rem !important;
+    letter-spacing: 5px !important;
+  }
+
+  .branding-rise {
+    font-size: 0.55rem !important;
+    letter-spacing: 3px !important;
+    margin-top: 3px !important;
+  }
+
+  .deco-line {
+    margin: 8px auto !important;
+  }
+
+  .login-branding p {
+    font-size: 0.65rem !important;
+    line-height: 1.35 !important;
+    max-width: 270px !important;
+  }
+
+  /* HERO NUMBERS */
+  .login-branding .text-center > div:last-child {
+    margin-top: 5px !important;
+  }
+
+  /* RIGHT LOGIN */
+  .login-form-wrap {
+    width: auto;
+    max-width: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .auth-card {
+    width: 290px !important;
+    max-width: 290px !important;
+    padding: 14px 18px !important;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+
+  /* TABS */
+  .auth-tabs {
+    margin-bottom: 8px !important;
+  }
+
+  .auth-tab {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* ALERT */
+  .alert {
+    padding: 5px 8px !important;
+    font-size: 0.68rem !important;
+    margin-bottom: 7px !important;
+  }
+
+  /* FORM */
+  .form-group {
+    margin-bottom: 7px !important;
+  }
+
+  .form-group label {
+    font-size: 0.68rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .form-group input {
+    height: 34px !important;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 9px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* FORGOT PASSWORD */
+  #login-form > div:nth-of-type(3) {
+    margin-bottom: 5px !important;
+  }
+
+  /* BUTTON */
+  .auth-card .btn {
+    height: 35px !important;
+    min-height: 35px !important;
+    padding: 5px !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* OR */
+  .divider {
+    margin: 6px 0 !important;
+    font-size: 0.65rem !important;
+  }
+
+  .auth-card p {
+    font-size: 0.65rem !important;
+    margin: 4px 0 !important;
+  }
+
+  /* BOTTOM COPYRIGHT */
+  .login-form-wrap > p {
+    font-size: 0.5rem !important;
+    margin-top: 5px !important;
+  }
+}
+
+
+/* =========================================================
+   EXTRA SHORT LANDSCAPE PHONES
+   ========================================================= */
+@media screen and (orientation: landscape) and (max-height: 430px) {
+
+  .login-container {
+    gap: 15px;
+  }
+
+  .login-branding {
+    width: 40%;
+    max-width: 300px;
+  }
+
+  .login-branding > div {
+    padding: 8px 10px !important;
+  }
+
+  .branding-10 {
+    font-size: 2.2rem !important;
+  }
+
+  .branding-legends {
+    font-size: 0.72rem !important;
+    letter-spacing: 4px !important;
+  }
+
+  .login-branding p {
+    font-size: 0.55rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .auth-card {
+    width: 260px !important;
+    max-width: 260px !important;
+    padding: 10px 14px !important;
+  }
+
+  .form-group {
+    margin-bottom: 5px !important;
+  }
+
+  .form-group input {
+    height: 30px !important;
+  }
+
+  .auth-card .btn {
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+}
+    /* =========================================================
+   REGISTER FORM - PHONE LANDSCAPE
+   ========================================================= */
+@media screen and (orientation: landscape) and (max-height: 600px) {
+
+  #register-form .form-group {
+    margin-bottom: 5px !important;
+  }
+
+  #register-form .form-group label {
+    font-size: 0.65rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  #register-form .form-group input {
+    height: 31px !important;
+    padding: 5px 9px !important;
+    font-size: 0.73rem !important;
+  }
+
+  #register-form .btn {
+    height: 33px !important;
+    min-height: 33px !important;
+    margin-top: 2px !important;
+    padding: 4px !important;
+    font-size: 0.68rem !important;
+  }
+
+  #register-form .divider {
+    margin: 4px 0 !important;
+  }
+
+  #register-form p {
+    margin: 2px 0 !important;
+    font-size: 0.62rem !important;
+  }
+}
+  </style>
+  
+<script>
+(function(){
+  try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function(){}); } catch(e) {}
+})();
+</script>
+</head>
+<body>
+<div class="login-bg-animated">
+  <img class="bg-img" src="https://res.cloudinary.com/jtrgd4x8/image/upload/f_auto,q_auto/background" alt="" fetchpriority="high"/>
+</div>
+<div class="embers" id="embers"></div>
+
+<div class="login-page">
+  <div class="login-container">
+
+    <!-- LEFT: Branding -->
+    <div class="login-branding">
+      <div class="text-center" style="background:rgba(0,0,0,0.75);border:1px solid rgba(240,192,64,0.2);border-radius:14px;padding:32px 28px;backdrop-filter:blur(8px);">
+        <div class="branding-10">TENFOLD</div>
+        <div class="branding-legends">LEGENDS</div>
+        <div class="branding-rise">✦ RISE OF THE TEN ✦</div>
+        <div class="deco-line"></div>
+        <p style="font-size:0.92rem;color:#d8d0c0;letter-spacing:1px;line-height:1.8;max-width:340px;margin:0 auto;text-shadow:0 1px 8px rgba(0,0,0,1);">
+          Ten legendary warriors. One destiny.<br>
+          Choose your legend, master your power,<br>
+          and rise to become the ultimate champion.
+        </p>
+        <div class="deco-line" style="margin-top:24px;"></div>
+        <div style="display:flex;gap:24px;justify-content:center;margin-top:12px;">
+          <div style="text-align:center;">
+            <div style="font-family:'Cinzel',serif;font-size:1.5rem;color:#f0c040;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,1);">10</div>
+            <div style="font-size:0.72rem;color:#c0b890;letter-spacing:1px;text-shadow:0 1px 6px rgba(0,0,0,1);">HEROES</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Cinzel',serif;font-size:1.5rem;color:#f0c040;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,1);">3</div>
+            <div style="font-size:0.72rem;color:#c0b890;letter-spacing:1px;text-shadow:0 1px 6px rgba(0,0,0,1);">SKILLS EACH</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Cinzel',serif;font-size:1.5rem;color:#f0c040;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,1);">∞</div>
+            <div style="font-size:0.72rem;color:#c0b890;letter-spacing:1px;text-shadow:0 1px 6px rgba(0,0,0,1);">BATTLES</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Auth Form -->
+    <div class="login-form-wrap">
+      <div class="auth-card">
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert" id="auth-alert"></div>
+
+        <!-- LOGIN FORM -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email" required/>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required/>
+          </div>
+          <div style="margin-bottom:8px;text-align:right;">
+            <a href="#" style="font-size:0.82rem;color:var(--subtext);" onclick="showForgotMsg(event)">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%;" id="login-btn">
+            <span id="login-btn-text">⚔ ENTER THE ARENA</span>
+          </button>
+          <div class="divider">or</div>
+          <p style="text-align:center;font-size:0.88rem;color:var(--subtext);">
+            No account? <a href="#" onclick="switchTab('register')">Register here</a>
+          </p>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="reg-username" placeholder="Your legend name" maxlength="20" autocomplete="username" required/>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="reg-email" placeholder="your@email.com" autocomplete="email" required/>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password" required/>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="reg-confirm" placeholder="Repeat password" autocomplete="new-password" required/>
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%;margin-top:4px;" id="reg-btn">
+            <span id="reg-btn-text">✦ CREATE YOUR LEGEND</span>
+          </button>
+          <div class="divider">or</div>
+          <p style="text-align:center;font-size:0.88rem;color:var(--subtext);">
+            Already a legend? <a href="#" onclick="switchTab('login')">Login here</a>
+          </p>
+        </form>
+
+      </div><!-- /auth-card -->
+
+      <!-- Bottom note -->
+      <p style="text-align:center;font-size:0.75rem;color:var(--subtext);margin-top:16px;letter-spacing:1px;">
+        TENFOLD LEGENDS &nbsp;·&nbsp; RISE OF THE TEN &nbsp;·&nbsp; 2025
+      </p>
+    </div><!-- /login-form-wrap -->
+
+  </div><!-- /login-container -->
+</div><!-- /login-page -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="game.js"></script>
+<script>
+  // ── EMBER PARTICLES ─────────────────────────────────────────
+  (function spawnEmbers() {
+    const container = document.getElementById('embers');
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+      const e = document.createElement('div');
+      e.className = 'ember';
+      const left = Math.random() * 100;
+      const dur  = 6 + Math.random() * 10;
+      const del  = Math.random() * 12;
+      const dx   = (Math.random() - 0.5) * 80;
+      const colors = ['#f0c040','#ff4500','#00cfff','#ff88ff','#88ffcc'];
+      e.style.cssText = `
+        left:${left}%;
+        animation-duration:${dur}s;
+        animation-delay:-${del}s;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        width:${2+Math.random()*4}px;
+        height:${2+Math.random()*4}px;
+        --dx:${dx}px;
+      `;
+      container.appendChild(e);
+    }
+  })();
+
+  // ── TAB SWITCHING ────────────────────────────────────────────
+  function switchTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('login-form').style.display    = isLogin ? 'block' : 'none';
+    document.getElementById('register-form').style.display = isLogin ? 'none'  : 'block';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-register').classList.toggle('active', !isLogin);
+    clearAlert();
+  }
+
+  // ── ALERT HELPERS ────────────────────────────────────────────
+  function showAlert(msg, type = 'error') {
+    const el = document.getElementById('auth-alert');
+    el.textContent = msg;
+    el.className = `alert alert-${type} show`;
+  }
+  function clearAlert() {
+    const el = document.getElementById('auth-alert');
+    el.className = 'alert';
+    el.textContent = '';
+  }
+
+  // ── TOAST ────────────────────────────────────────────────────
+  function showToast(msg, type = 'info') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3000);
+  }
+
+  // ── MOBILE-SAFE API REQUEST ─────────────────────────────────────
+  // MIT App Inventor WebViewer can sometimes leave an external request
+  // waiting for a long time. The game must still be usable on the phone,
+  // so the local account is used immediately when the API is unreachable.
+  async function mobileApiCall(params, timeoutMs = 6000) {
+    try {
+      return await Promise.race([
+        apiCall(params),
+        new Promise(resolve => setTimeout(() => resolve({
+          success: false,
+          timeout: true,
+          message: 'Server took too long to respond.'
+        }), timeoutMs))
+      ]);
+    } catch (err) {
+      return {
+        success: false,
+        message: err && err.message ? err.message : 'Connection error.'
+      };
+    }
+  }
+
+  // ── LOGIN ────────────────────────────────────────────────────────
+  async function handleLogin(e) {
+    e.preventDefault();
+    clearAlert();
+
+    const email    = document.getElementById('login-email').value.trim().toLowerCase();
+    const password = document.getElementById('login-password').value;
+
+    const btn      = document.getElementById('login-btn');
+    const btnText  = document.getElementById('login-btn-text');
+
+    if (!email || !password) {
+      showAlert('Please fill in all fields.');
+      return;
+    }
+
+    btn.disabled = true;
+    btnText.textContent = 'Entering…';
+
+    // 1. Check this phone's saved account first.
+    // This makes login work reliably inside MIT App Inventor WebViewer.
+
+    // 2. If there is no local account, try Google Apps Script.
+    const res = await mobileApiCall({
+      action: 'login',
+      email,
+      password
+    });
+
+    if (res.success) {
+
+      Game.login(res);
+      showAlert(`Welcome back, ${res.username}!`, 'success');
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 500);
+      return;
+    }
+
+    showAlert(res.timeout
+      ? 'Cannot reach the server right now. Register/login on this phone first, or check your internet connection.'
+      : (res.message || 'Invalid email or password.'));
+
+    btn.disabled = false;
+    btnText.textContent = '⚔ ENTER THE ARENA';
+  }
+
+  // ── REGISTER ────────────────────────────────────────────────────
+  async function handleRegister(e) {
+    e.preventDefault();
+    clearAlert();
+
+    const username = document.getElementById('reg-username').value.trim();
+    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+    const password = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    const btn = document.getElementById('reg-btn');
+    const btnText = document.getElementById('reg-btn-text');
+
+    if (!username || !email || !password || !confirm) { showAlert('Please fill in all fields.'); return; }
+    if (username.length < 3) { showAlert('Username must be at least 3 characters.'); return; }
+    if (password.length < 6) { showAlert('Password must be at least 6 characters.'); return; }
+    if (password !== confirm) { showAlert('Passwords do not match.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('Please enter a valid email.'); return; }
+
+    btn.disabled = true;
+    btn.style.pointerEvents = 'none';
+    btnText.textContent = 'SAVING TO SERVER…';
+
+    // ── SERVER-FIRST REGISTER ────────────────────────────────────
+    // Wait for Google Sheets to save the account before proceeding.
+    // This ensures the UserID is the real server-side ID so all
+    // EXP, scores, and progress are saved correctly.
+    const res = await mobileApiCall({ action: 'register', username, email, password }, 12000);
+
+    if (res && res.success) {
+      // Real server ID — all progress will save correctly to Google Sheets
+      Game.login({
+        userID:     res.userID,
+        username:   res.username   || username,
+        email:      email,
+        totalScore: 0,
+        sessionID:  res.sessionID  || ''
+      });
+      showAlert(`Legend created! Welcome, ${username}!`, 'success');
+      btnText.textContent = 'LEGEND CREATED ✓';
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
+
+    } else if (res && res.timeout) {
+      // Server unreachable — warn the user, do NOT proceed with a local ID
+      showAlert('Cannot reach the server. Please check your internet connection and try again.', 'error');
+      btn.disabled = false;
+      btn.style.pointerEvents = '';
+      btnText.textContent = '✦ CREATE YOUR LEGEND';
+
+    } else {
+      // Server returned an error (e.g. email already taken)
+      showAlert(res.message || 'Registration failed. Please try again.', 'error');
+      btn.disabled = false;
+      btn.style.pointerEvents = '';
+      btnText.textContent = '✦ CREATE YOUR LEGEND';
+    }
+  }
+
+  function showForgotMsg(e) {
+    e.preventDefault();
+    showAlert('Password reset: contact your administrator or check the Apps Script sheet.', 'info');
+  }
+
+  // ── AUTO LOGIN CHECK ──────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    // If not coming from loading screen, show it first
+    if (!sessionStorage.getItem('tenfold_loaded')) {
+      window.location.replace('loading.html');
+      return;
+    }
+    if (Game.loadUser()) {
+      window.location.href = 'dashboard.html';
+    }
+  });
+</script>
+</body>
+</html>
